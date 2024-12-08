@@ -17,35 +17,39 @@ FSteamBigPictureTextField::FSteamBigPictureTextField()
 void FSteamBigPictureTextField::ShowVirtualKeyboard(bool bShow, int32 UserIndex, TSharedPtr<IVirtualKeyboardEntry> TextEntryWidget)
 {
 #if ONDECK_STEAM_API_AVAILABLE
-	const bool bMultiLineEntry = TextEntryWidget->IsMultilineEntry();
-	const bool bPasswordEntry = TextEntryWidget->GetVirtualKeyboardType() == Keyboard_Password;
+	if(TextEntryWidget)
+	{
+		const bool bMultiLineEntry = TextEntryWidget->IsMultilineEntry();
+		const bool bPasswordEntry = TextEntryWidget->GetVirtualKeyboardType() == Keyboard_Password;
 	
-	const auto HintTextChar = StringCast<UTF8CHAR>(*TextEntryWidget->GetHintText().ToString());
-	const auto PlaceholderTextChar = StringCast<UTF8CHAR>(*TextEntryWidget->GetText().ToString());
-	
-	const EGamepadTextInputMode TextInputMode = bPasswordEntry ?
-		EGamepadTextInputMode::k_EGamepadTextInputModePassword :
-		EGamepadTextInputMode::k_EGamepadTextInputModeNormal;
-	
-	const EGamepadTextInputLineMode LineInputMode = bMultiLineEntry ?
-		EGamepadTextInputLineMode::k_EGamepadTextInputLineModeSingleLine :
-		EGamepadTextInputLineMode::k_EGamepadTextInputLineModeMultipleLines;
+		const auto HintTextChar = StringCast<UTF8CHAR>(*TextEntryWidget->GetHintText().ToString());
+		const auto PlaceholderTextChar = StringCast<UTF8CHAR>(*TextEntryWidget->GetText().ToString());
+		const uint32 CharMax = NAME_SIZE -1;
 
-	if (SteamUtils()->ShowGamepadTextInput(TextInputMode,
-                                           LineInputMode,
-                                           reinterpret_cast<const char*>(HintTextChar.Get()),
-                                           0,
-                                           reinterpret_cast<const char*>(PlaceholderTextChar.Get())
-	))
-	{
-		UE_LOGFMT(LogOnDeck, Verbose, "Showing virtual keyboard.");
+		const EGamepadTextInputMode TextInputMode = bPasswordEntry ?
+			EGamepadTextInputMode::k_EGamepadTextInputModePassword :
+			EGamepadTextInputMode::k_EGamepadTextInputModeNormal;
 	
-		// virtual keyboard shown, so store the widget that requested it
-		CurrentTextEntryWidget = TextEntryWidget;
-	}
-	else
-	{
-		UE_LOGFMT(LogOnDeck, Warning, "Failed to show virtual keyboard. Overlay might be disabled.");
+		const EGamepadTextInputLineMode LineInputMode = bMultiLineEntry ?
+			EGamepadTextInputLineMode::k_EGamepadTextInputLineModeSingleLine :
+			EGamepadTextInputLineMode::k_EGamepadTextInputLineModeMultipleLines;
+
+		if (SteamUtils()->ShowGamepadTextInput(TextInputMode,
+											   LineInputMode,
+											   reinterpret_cast<const char*>(HintTextChar.Get()),
+											   CharMax,
+											   reinterpret_cast<const char*>(PlaceholderTextChar.Get())
+		))
+		{
+			UE_LOGFMT(LogOnDeck, Verbose, "Showing virtual keyboard.");
+	
+			// virtual keyboard shown, so store the widget that requested it
+			CurrentTextEntryWidget = TextEntryWidget;
+		}
+		else
+		{
+			UE_LOGFMT(LogOnDeck, Warning, "Failed to show virtual keyboard. Overlay might be disabled.");
+		}
 	}
 #endif
 }
