@@ -2,6 +2,7 @@
 
 #include "SteamBigPictureTextField.h"
 #include "OnDeckLogChannels.h"
+#include "Steam/OnDeckSettings.h"
 
 #if ONDECK_STEAM_API_AVAILABLE
 	#include "steam/isteamutils.h"
@@ -31,10 +32,12 @@ void FSteamBigPictureTextField::ShowVirtualKeyboard(bool bShow, int32 UserIndex,
 		EGamepadTextInputLineMode::k_EGamepadTextInputLineModeSingleLine :
 		EGamepadTextInputLineMode::k_EGamepadTextInputLineModeMultipleLines;
 
+	const int32 MaxEntryLength = GetDefault<UOnDeckSettings>()->MaxVirtualKeyboardTextLength + 1;
+	
 	if (SteamUtils()->ShowGamepadTextInput(TextInputMode,
                                            LineInputMode,
                                            reinterpret_cast<const char*>(HintTextChar.Get()),
-                                           0,
+                                           MaxEntryLength,
                                            reinterpret_cast<const char*>(PlaceholderTextChar.Get())
 	))
 	{

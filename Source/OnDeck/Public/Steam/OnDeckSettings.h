@@ -27,5 +27,9 @@ public:
 	// Enable virtual keyboard support if Big Picture mode (including on Steam Deck) is detected.
 	UPROPERTY(Config, EditAnywhere)
 	bool bEnableVirtualKeyboard = true;
+
+	// What is the maximum length of text that can be entered into a virtual keyboard?
+	UPROPERTY(Config, EditAnywhere, meta = (EditCondition = "bEnableVirtualKeyboard"))
+	int32 MaxVirtualKeyboardTextLength = 1024;
 	
 };
